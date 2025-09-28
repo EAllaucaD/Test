@@ -1,4 +1,4 @@
-name: Build and Deploy
+name: Build and Deploy Frontend-Test2
 
 on:
   push:
@@ -20,19 +20,5 @@ jobs:
 
       - name: Build and Push Docker image
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/test-app:latest .
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/test-app:latest
-
-      - name: Setup kubectl
-        uses: azure/setup-kubectl@v3
-        with:
-          version: 'latest'
-
-      - name: Configure Kubeconfig
-        run: |
-          mkdir -p $HOME/.kube
-          echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 --decode > $HOME/.kube/config
-
-      - name: Apply K8s Manifests
-        run: |
-          kubectl apply -f k8s/ -n test
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/frontend-test2:latest .
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/frontend-test2:latest
