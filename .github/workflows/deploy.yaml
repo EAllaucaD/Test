@@ -1,4 +1,4 @@
-name: Deploy Web App
+name: Build and Deploy
 
 on:
   push:
@@ -6,39 +6,28 @@ on:
       - main
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
-
     steps:
-    # 1️⃣ Descargar el repositorio
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    # 2️⃣ Configurar DockerHub
-    - name: Log in to DockerHub
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_PASS }}
 
-    # 3️⃣ Construir imagen Docker
-    - name: Build Docker image
-      run: |
-        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/frontend-test:latest .
+      - name: Build and Push Docker image
+        run: |
+          docker build -t ${{ secrets.DOCKER_USER }}/test-app:latest .
+          docker push ${{ secrets.DOCKER_USER }}/test-app:latest
 
-    # 4️⃣ Push de la imagen a DockerHub
-    - name: Push Docker image
-      run: |
-        docker push ${{ secrets.DOCKERHUB_USERNAME }}/frontend-test:latest
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
 
-    # 5️⃣ Configurar kubeconfig
-    - name: Configure Kubeconfig
-      run: |
-        echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 --decode > kubeconfig
-        export KUBECONFIG=$PWD/kubeconfig
-
-    # 6️⃣ Desplegar a Kubernetes
-    - name: Deploy to Kubernetes
-      run: |
-        kubectl apply -f k8s/deploy.yaml
-        kubectl apply -f k8s/service.yaml
+      - name: Apply K8s Manifests
+        run: |
+          kubectl apply -f k8s/ -n test
