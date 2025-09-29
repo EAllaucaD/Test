@@ -40,4 +40,6 @@ app.post('/upload', upload.single('file'), (req, res) => {
     });
 });
 
-app.listen(3000, () => console.log('Servidor corriendo en http://localhost:3000'));
+// Tomar el puerto de la variable de entorno PORT, si no existe usar 80
+const PORT = process.env.PORT || 80;
+app.listen(PORT, () => console.log(`Servidor corriendo en http://localhost:${PORT}`));
