@@ -18,7 +18,7 @@ const minioClient = new Minio.Client({
 minioClient.bucketExists('test', function(err, exists) {
     if (err) return console.log(err);
     if (!exists) {
-        minioClient.makeBucket('test', 'us-east-1', function(err) {
+        minioClient.makeBucket('test', '', function(err) {
             if (err) return console.log(err);
             console.log('Bucket "test" creado');
         });
